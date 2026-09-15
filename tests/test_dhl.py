@@ -307,30 +307,43 @@ def test_sensor_platforms():
     # 2. Delivered Sensor
     delivered_sensor = DHLParcelDeliveredSensor(coordinator, entry)
     assert delivered_sensor.native_value == 1  # p_delivered
-    assert len(delivered_sensor.extra_state_attributes["tracking_numbers"]) == 1
+    attrs_del = delivered_sensor.extra_state_attributes
+    assert isinstance(attrs_del, dict)
+    assert len(attrs_del["tracking_numbers"]) == 1
 
     # 3. Incoming Sensor (active incoming in transit)
     incoming_sensor = DHLParcelIncomingSensor(coordinator, entry)
     assert incoming_sensor.native_value == 1  # p_transit (active incoming)
-    assert incoming_sensor.extra_state_attributes["total_incoming"] == 2
+    attrs_inc = incoming_sensor.extra_state_attributes
+    assert isinstance(attrs_inc, dict)
+    assert attrs_inc["total_incoming"] == 2
 
     # 4. Outgoing Sensor (active outgoing in transit)
     outgoing_sensor = DHLParcelOutgoingSensor(coordinator, entry)
     assert outgoing_sensor.native_value == 1  # p_outgoing (active outgoing)
-    assert outgoing_sensor.extra_state_attributes["total_outgoing"] == 1
+    attrs_out = outgoing_sensor.extra_state_attributes
+    assert isinstance(attrs_out, dict)
+    assert attrs_out["total_outgoing"] == 1
 
     # 5. Archived Sensor
     archived_sensor = DHLParcelArchivedSensor(coordinator, entry)
     assert archived_sensor.native_value == 1  # p_delivered (list_type: ARCHIVIERT)
-    assert len(archived_sensor.extra_state_attributes["tracking_numbers"]) == 1
+    attrs_arc = archived_sensor.extra_state_attributes
+    assert isinstance(attrs_arc, dict)
+    assert len(attrs_arc["tracking_numbers"]) == 1
     assert archived_sensor.device_info is not None
     assert archived_sensor.device_info.name == "DHL (1234567890)"
 
     # 6. Total Sensor
     total_sensor = DHLParcelTotalSensor(coordinator, entry)
     assert total_sensor.native_value == 3
-
-    # 7. Last Update Sensor
+    attrs_tot = total_sensor.extra_state_attributes
+    assert isinstance(attrs_tot, dict)
+    assert attrs_tot["in_transit"] == 2
+    assert attrs_tot["delivered"] == 1
+    assert attrs_tot["incoming"] == 2
+    assert attrs_tot["outgoing"] == 1
+    assert attrs_tot["all_monitored"] == 3
     last_update_sensor = DHLLastUpdateSensor(coordinator, entry)
     assert last_update_sensor.native_value == datetime(
         2026, 9, 15, 12, 0, 0, tzinfo=timezone.utc

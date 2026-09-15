@@ -13,6 +13,9 @@ from homeassistant.util import dt as dt_util
 
 from .api import DHLAuthError, DHLClient, DHLConnectionError, DHLRateLimitError
 from .const import (
+    CONF_DHLA0,
+    CONF_DHLB,
+    CONF_DHLR0,
     CONF_INCLUDE_ARCHIVED,
     CONF_POLL_INTERVAL,
     DEFAULT_INCLUDE_ARCHIVED,
@@ -62,7 +65,17 @@ class DHLDataUpdateCoordinator(DataUpdateCoordinator[list[Parcel]]):
                 self.entry.title,
             )
             try:
-                await self.client.async_refresh_tokens()
+                refreshed = await self.client.async_refresh_tokens()
+                if refreshed and self.client.credentials:
+                    self.hass.config_entries.async_update_entry(
+                        self.entry,
+                        data={
+                            **self.entry.data,
+                            CONF_DHLA0: self.client.credentials.dhla0,
+                            CONF_DHLR0: self.client.credentials.dhlr0,
+                            CONF_DHLB: self.client.credentials.dhlb,
+                        },
+                    )
             except DHLAuthError as err:
                 _LOGGER.error(
                     "DHL session refresh failed for '%s': %s (re-authentication required)",

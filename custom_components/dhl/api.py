@@ -540,31 +540,45 @@ class DHLClient:
                     )
                     return False
 
+                # Parse JSON response body if available
+                try:
+                    data = await resp.json()
+                    if isinstance(data, dict):
+                        if data.get("status") != 0 or data.get("akamaiError"):
+                            err_detail = (data.get("akamaiError") or {}).get(
+                                "detail"
+                            ) or f"status={data.get('status')}"
+                            _LOGGER.warning(
+                                "DHL token refresh rejected by backend (%s)",
+                                err_detail,
+                            )
+                            raise DHLAuthError(
+                                f"DHL session refresh rejected: {err_detail}"
+                            )
+                        user_info = data.get("userInfo") or {}
+                        if (expiry := user_info.get("expiryDate")) and float(
+                            expiry
+                        ) > 0:
+                            self.credentials.expires_at = float(expiry)
+                except (json.JSONDecodeError, ValueError, aiohttp.ContentTypeError):
+                    _LOGGER.debug(
+                        "Could not parse JSON response during session refresh"
+                    )
+
                 # Check for updated cookies
                 new_dhla0 = resp.cookies.get("dhla0")
                 new_dhlr0 = resp.cookies.get("dhlr0")
                 new_dhlb = resp.cookies.get("dhlb")
 
-                if new_dhla0:
+                if new_dhla0 and len(new_dhla0.value.split(".")) >= 2:
                     self.credentials.dhla0 = new_dhla0.value
                     payload = _decode_jwt_payload(new_dhla0.value)
                     if exp := payload.get("exp"):
                         self.credentials.expires_at = float(exp)
-                if new_dhlr0:
+                if new_dhlr0 and new_dhlr0.value:
                     self.credentials.dhlr0 = new_dhlr0.value
-                if new_dhlb:
+                if new_dhlb and new_dhlb.value:
                     self.credentials.dhlb = new_dhlb.value
-
-                # Parse JSON response body if available
-                try:
-                    data = await resp.json()
-                    user_info = data.get("userInfo") or {}
-                    if expiry := user_info.get("expiryDate"):
-                        self.credentials.expires_at = float(expiry)
-                except (json.JSONDecodeError, ValueError, aiohttp.ContentTypeError):
-                    _LOGGER.debug(
-                        "Could not parse JSON response during session refresh"
-                    )
 
                 _LOGGER.debug(
                     "DHL session tokens refreshed successfully for %s (new expiry in %.1f min)",
@@ -572,7 +586,6 @@ class DHLClient:
                     (self.credentials.expires_at - time.time()) / 60,
                 )
                 return True
-
         except (aiohttp.ClientError, asyncio.TimeoutError) as err:
             _LOGGER.warning("Connection error during DHL token refresh: %s", err)
             raise DHLConnectionError(
