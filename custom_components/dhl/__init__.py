@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import DHLClient, DHLCredentials, _decode_jwt_payload
@@ -20,8 +19,6 @@ from .const import (
     CONF_EMAIL,
     CONF_POST_NUMBER,
     CONF_VERFOLGEN_CSRF,
-    DHL_PORTAL_HOST,
-    DOMAIN,
 )
 from .coordinator import DHLDataUpdateCoordinator
 from .services import async_setup_services, async_unload_services
@@ -95,19 +92,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: DHLConfigEntry) -> bool:
         client=client,
         coordinator=coordinator,
     )
-    # Register device in Home Assistant Device Registry
-    device_registry = dr.async_get(hass)
-    device_identifier = entry.unique_id or entry.entry_id
-    device_registry.async_get_or_create(
-        config_entry_id=entry.entry_id,
-        identifiers={(DOMAIN, device_identifier)},
-        name=entry.title,
-        manufacturer="DHL",
-        model="Web Internal API",
-        entry_type=dr.DeviceEntryType.SERVICE,
-        configuration_url=f"https://{DHL_PORTAL_HOST}",
-    )
-
     # Register service actions
     await async_setup_services(hass)
     # Forward setup to platforms

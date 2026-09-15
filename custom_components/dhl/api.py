@@ -104,6 +104,19 @@ def _mask_token(token: str | None) -> str:
     return "***"
 
 
+def _extract_error_detail(html: str) -> str:
+    """Extract error code or message from DHL/Akamai error page."""
+    import re
+
+    match = re.search(r"<dt>Fehlercode:?</dt>\s*<dd>(.*?)</dd>", html, re.IGNORECASE)
+    if match:
+        return f"Akamai WAF Bot Protection Block (Error code: {match.group(1).strip()})"
+    h1_match = re.search(r"<h1>(.*?)</h1>", html, re.IGNORECASE)
+    if h1_match:
+        return f"DHL Error: {h1_match.group(1).strip()}"
+    return "Blocked by DHL security / Akamai WAF"
+
+
 class DHLClient:
     """Client for DHL web internal tracking API and CIAM login."""
 
@@ -161,14 +174,15 @@ class DHLClient:
                     resp.status,
                 )
                 if resp.status not in (302, 303, 307):
-                    text_sample = (await resp.text())[:300]
+                    text_sample = (await resp.text())[:1000]
+                    detail = _extract_error_detail(text_sample)
                     _LOGGER.warning(
-                        "CIAM Step 1 failed: Expected 302 redirect, got HTTP %s. Body: %s",
+                        "CIAM Step 1 failed (HTTP %s, %s). Please use the 'Session cookies' authentication method instead.",
                         resp.status,
-                        text_sample,
+                        detail,
                     )
                     raise DHLAuthError(
-                        f"Login initialization failed with status {resp.status}"
+                        f"Login initialization failed (HTTP {resp.status}: {detail}). Please use 'Session cookies' authentication method."
                     )
                 auth_url = resp.headers.get("Location")
                 if not auth_url:
@@ -184,14 +198,15 @@ class DHLClient:
             ) as resp:
                 _LOGGER.debug("CIAM Step 2 response status: %s", resp.status)
                 if resp.status not in (302, 303, 307):
-                    text_sample = (await resp.text())[:300]
+                    text_sample = (await resp.text())[:1000]
+                    detail = _extract_error_detail(text_sample)
                     _LOGGER.warning(
-                        "CIAM Step 2 failed: Auth0 entrypoint returned HTTP %s. Body: %s",
+                        "CIAM Step 2 failed (HTTP %s, %s). Please use the 'Session cookies' authentication method instead.",
                         resp.status,
-                        text_sample,
+                        detail,
                     )
                     raise DHLAuthError(
-                        f"Authorize entrypoint failed with status {resp.status}"
+                        f"Authorize entrypoint failed (HTTP {resp.status}: {detail}). Please use 'Session cookies' authentication method."
                     )
                 identifier_loc = resp.headers.get("Location")
                 if not identifier_loc:
@@ -228,14 +243,15 @@ class DHLClient:
             ) as resp:
                 _LOGGER.debug("CIAM Step 3 response status: %s", resp.status)
                 if resp.status not in (302, 303, 307):
-                    text_sample = (await resp.text())[:300]
+                    text_sample = (await resp.text())[:1000]
+                    detail = _extract_error_detail(text_sample)
                     _LOGGER.warning(
-                        "CIAM Step 3 failed: Identifier submission returned HTTP %s (possible bot challenge or invalid email). Body: %s",
+                        "CIAM Step 3 failed (HTTP %s, %s). Identifier rejected. Please use 'Session cookies' authentication method.",
                         resp.status,
-                        text_sample,
+                        detail,
                     )
                     raise DHLAuthError(
-                        "Invalid username or identifier rejected by DHL Auth0"
+                        f"Invalid username or identifier rejected (HTTP {resp.status}: {detail}). Please use 'Session cookies' authentication method."
                     )
                 password_loc = resp.headers.get("Location")
                 if not password_loc:
@@ -267,13 +283,16 @@ class DHLClient:
             ) as resp:
                 _LOGGER.debug("CIAM Step 4 response status: %s", resp.status)
                 if resp.status not in (302, 303, 307):
-                    text_sample = (await resp.text())[:300]
+                    text_sample = (await resp.text())[:1000]
+                    detail = _extract_error_detail(text_sample)
                     _LOGGER.warning(
-                        "CIAM Step 4 failed: Password submission returned HTTP %s. Body: %s",
+                        "CIAM Step 4 failed (HTTP %s, %s). DHL Akamai Bot Manager blocked automated password submission. Please use the 'Session cookies' authentication method instead.",
                         resp.status,
-                        text_sample,
+                        detail,
                     )
-                    raise DHLAuthError("Invalid credentials or login rejected by DHL")
+                    raise DHLAuthError(
+                        f"DHL Akamai Bot Manager blocked login ({detail}). Please use the 'Session cookies' authentication method instead."
+                    )
                 resume_loc = resp.headers.get("Location")
                 if not resume_loc:
                     raise DHLAuthError("Missing resume redirect URL")
@@ -282,7 +301,7 @@ class DHLClient:
                         "CIAM Step 4 redirected back to login (invalid password or 2FA prompt required)"
                     )
                     raise DHLAuthError(
-                        "Invalid password or 2FA required. Please use session cookies login method instead."
+                        "Invalid password or 2FA required. Please use 'Session cookies' authentication method."
                     )
                 resume_url = urljoin(f"https://{AUTH0_DOMAIN}", resume_loc)
                 _LOGGER.debug("CIAM Step 4 resume URL: %s", resume_url.split("?")[0])

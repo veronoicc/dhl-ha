@@ -49,7 +49,7 @@ class DHLDataUpdateCoordinator(DataUpdateCoordinator[list[Parcel]]):
         super().__init__(
             hass,
             _LOGGER,
-            name=f"DHL ({entry.title})",
+            name=entry.title,
             update_interval=timedelta(minutes=max(5, int(poll_minutes))),
         )
 

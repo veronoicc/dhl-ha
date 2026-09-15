@@ -12,12 +12,10 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import DHLConfigEntry
-from .const import DOMAIN
 from .coordinator import DHLDataUpdateCoordinator
 from .models import Parcel, ParcelDirection
 
@@ -61,17 +59,6 @@ class DHLBaseSensor(CoordinatorEntity[DHLDataUpdateCoordinator], SensorEntity):
         unique_base = entry.unique_id or entry.entry_id
         self._attr_unique_id = f"{unique_base}_{sensor_key}"
         self._attr_translation_key = sensor_key
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device information linking to the DHL account service."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, self.entry.unique_id or self.entry.entry_id)},
-            name=f"DHL ({self.entry.title})",
-            manufacturer="DHL",
-            model="Kundenkonto",
-            entry_type=DeviceEntryType.SERVICE,
-        )
 
     def _parcel_detail_dict(self, parcel: Parcel) -> dict[str, Any]:
         """Format detailed parcel dictionary for attributes."""

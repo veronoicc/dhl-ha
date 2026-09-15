@@ -561,16 +561,11 @@ class DHLConfigFlow(ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Get the options flow handler."""
-        return DHLOptionsFlowHandler(config_entry)
+        return DHLOptionsFlowHandler()
 
 
 class DHLOptionsFlowHandler(OptionsFlow):
     """Handle options for DHL integration."""
-
-    def __init__(self, config_entry: ConfigEntry | None = None) -> None:
-        """Initialize DHL options flow."""
-        if config_entry is not None:
-            self.config_entry = config_entry
 
     async def async_step_init(
         self,
