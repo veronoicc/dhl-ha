@@ -96,7 +96,7 @@ class DHLDataUpdateCoordinator(DataUpdateCoordinator[list[Parcel]]):
 
         include_archived = self.entry.options.get(
             CONF_INCLUDE_ARCHIVED,
-            DEFAULT_INCLUDE_ARCHIVED,
+            self.entry.data.get(CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED),
         )
 
         active_parcels = [

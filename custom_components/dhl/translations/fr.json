@@ -108,6 +108,9 @@
       "outgoing": {
         "name": "Sortant"
       },
+      "archived": {
+        "name": "Archivé"
+      },
       "total": {
         "name": "Total"
       },

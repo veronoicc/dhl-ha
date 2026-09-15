@@ -106,7 +106,10 @@
         "name": "Przychodząca"
       },
       "outgoing": {
-        "name": "Wychodząca"
+        "name": "Wychodzące"
+      },
+      "archived": {
+        "name": "Zarchiwizowane"
       },
       "total": {
         "name": "Łącznie"

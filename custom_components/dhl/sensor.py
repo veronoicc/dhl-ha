@@ -12,12 +12,14 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import DHLConfigEntry
+from .const import DOMAIN
 from .coordinator import DHLDataUpdateCoordinator
-from .models import Parcel, ParcelDirection
+from .models import Parcel, ParcelDirection, ParcelListType
 
 
 async def async_setup_entry(
@@ -34,6 +36,7 @@ async def async_setup_entry(
             DHLParcelDeliveredSensor(coordinator, entry),
             DHLParcelIncomingSensor(coordinator, entry),
             DHLParcelOutgoingSensor(coordinator, entry),
+            DHLParcelArchivedSensor(coordinator, entry),
             DHLParcelTotalSensor(coordinator, entry),
             DHLLastUpdateSensor(coordinator, entry),
         ]
@@ -59,6 +62,18 @@ class DHLBaseSensor(CoordinatorEntity[DHLDataUpdateCoordinator], SensorEntity):
         unique_base = entry.unique_id or entry.entry_id
         self._attr_unique_id = f"{unique_base}_{sensor_key}"
         self._attr_translation_key = sensor_key
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device information linking to the DHL account."""
+        unique_base = self.entry.unique_id or self.entry.entry_id
+        return DeviceInfo(
+            identifiers={(DOMAIN, unique_base)},
+            name=self.entry.title,
+            manufacturer="DHL",
+            model="Kundenkonto",
+            entry_type=DeviceEntryType.SERVICE,
+        )
 
     def _parcel_detail_dict(self, parcel: Parcel) -> dict[str, Any]:
         """Format detailed parcel dictionary for attributes."""
@@ -243,6 +258,44 @@ class DHLParcelOutgoingSensor(DHLBaseSensor):
         ]
         return {
             "total_outgoing": len(all_outgoing),
+            "tracking_numbers": [p.tracking_number for p in parcels],
+            "parcels": [self._parcel_detail_dict(p) for p in parcels],
+        }
+
+
+class DHLParcelArchivedSensor(DHLBaseSensor):
+    """Sensor tracking the count of archived parcels."""
+
+    _attr_icon = "mdi:archive-outline"
+    _attr_state_class = SensorStateClass.TOTAL
+
+    def __init__(
+        self,
+        coordinator: DHLDataUpdateCoordinator,
+        entry: DHLConfigEntry,
+    ) -> None:
+        """Initialize archived parcels sensor."""
+        super().__init__(coordinator, entry, "archived")
+
+    @property
+    def _archived_parcels(self) -> list[Parcel]:
+        """Return list of archived parcels."""
+        return [
+            p
+            for p in self.coordinator.all_parcels
+            if p.list_type == ParcelListType.ARCHIVIERT or p.is_archived
+        ]
+
+    @property
+    def native_value(self) -> int:
+        """Return count of archived parcels."""
+        return len(self._archived_parcels)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return archived parcel details."""
+        parcels = self._archived_parcels
+        return {
             "tracking_numbers": [p.tracking_number for p in parcels],
             "parcels": [self._parcel_detail_dict(p) for p in parcels],
         }

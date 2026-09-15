@@ -108,6 +108,9 @@
       "outgoing": {
         "name": "Outgoing"
       },
+      "archived": {
+        "name": "Archived"
+      },
       "total": {
         "name": "Total"
       },

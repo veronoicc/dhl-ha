@@ -108,6 +108,9 @@
       "outgoing": {
         "name": "In uscita"
       },
+      "archived": {
+        "name": "Archiviato"
+      },
       "total": {
         "name": "Totale"
       },

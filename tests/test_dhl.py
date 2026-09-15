@@ -26,6 +26,7 @@ from custom_components.dhl.models import (
 )
 from custom_components.dhl.sensor import (
     DHLLastUpdateSensor,
+    DHLParcelArchivedSensor,
     DHLParcelDeliveredSensor,
     DHLParcelIncomingSensor,
     DHLParcelInTransitSensor,
@@ -318,15 +319,23 @@ def test_sensor_platforms():
     assert outgoing_sensor.native_value == 1  # p_outgoing (active outgoing)
     assert outgoing_sensor.extra_state_attributes["total_outgoing"] == 1
 
-    # 5. Total Sensor
+    # 5. Archived Sensor
+    archived_sensor = DHLParcelArchivedSensor(coordinator, entry)
+    assert archived_sensor.native_value == 1  # p_delivered (list_type: ARCHIVIERT)
+    assert len(archived_sensor.extra_state_attributes["tracking_numbers"]) == 1
+    assert archived_sensor.device_info is not None
+    assert archived_sensor.device_info.name == "DHL (1234567890)"
+
+    # 6. Total Sensor
     total_sensor = DHLParcelTotalSensor(coordinator, entry)
     assert total_sensor.native_value == 3
 
-    # 6. Last Update Sensor
+    # 7. Last Update Sensor
     last_update_sensor = DHLLastUpdateSensor(coordinator, entry)
     assert last_update_sensor.native_value == datetime(
         2026, 9, 15, 12, 0, 0, tzinfo=timezone.utc
     )
+    assert last_update_sensor.device_info is not None
 
 
 def test_todo_list_platform():

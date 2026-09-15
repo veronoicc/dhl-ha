@@ -12,12 +12,13 @@ from homeassistant.components.todo import (
     TodoListEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import DHLConfigEntry
-from .const import CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED
+from .const import CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED, DOMAIN
 from .coordinator import DHLDataUpdateCoordinator
 from .models import Parcel, ParcelDirection, ParcelListType
 
@@ -55,6 +56,18 @@ class DHLParcelTodoListEntity(
 
         unique_base = entry.unique_id or entry.entry_id
         self._attr_unique_id = f"{unique_base}_parcels"
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device information linking to the DHL account."""
+        unique_base = self.entry.unique_id or self.entry.entry_id
+        return DeviceInfo(
+            identifiers={(DOMAIN, unique_base)},
+            name=self.entry.title,
+            manufacturer="DHL",
+            model="Kundenkonto",
+            entry_type=DeviceEntryType.SERVICE,
+        )
 
     def _parse_due_date(self, date_str: str | None) -> date | datetime | None:
         """Parse expected delivery date into date or datetime."""
@@ -136,7 +149,8 @@ class DHLParcelTodoListEntity(
     def todo_items(self) -> list[TodoItem] | None:
         """Return the current list of delivery items."""
         include_archived = self.entry.options.get(
-            CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED
+            CONF_INCLUDE_ARCHIVED,
+            self.entry.data.get(CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED),
         )
 
         source_parcels = (
