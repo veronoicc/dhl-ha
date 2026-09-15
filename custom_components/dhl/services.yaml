@@ -1,0 +1,49 @@
+get_parcels:
+  name: Get parcels
+  description: Fetch a filtered list of tracked DHL parcels and shipments with detailed progress, delivery, and recipient information.
+  fields:
+    config_entry_id:
+      name: DHL Account
+      description: Target a specific DHL account config entry ID. Leave empty to query all configured DHL accounts.
+      required: false
+      selector:
+        config_entry:
+          integration: dhl
+    status_filter:
+      name: Status filter
+      description: Filter parcels by delivery state or direction.
+      required: false
+      default: all
+      selector:
+        select:
+          options:
+            - label: All shipments
+              value: all
+            - label: In transit (active)
+              value: in_transit
+            - label: Delivered
+              value: delivered
+            - label: Incoming
+              value: incoming
+            - label: Outgoing
+              value: outgoing
+          mode: dropdown
+    include_archived:
+      name: Include archived
+      description: Whether to include completed/archived shipments in the returned list.
+      required: false
+      default: false
+      selector:
+        boolean:
+
+refresh_parcels:
+  name: Refresh parcels
+  description: Trigger an immediate API poll to refresh DHL parcel tracking data.
+  fields:
+    config_entry_id:
+      name: DHL Account
+      description: Target a specific DHL account config entry ID. Leave empty to refresh all configured accounts.
+      required: false
+      selector:
+        config_entry:
+          integration: dhl

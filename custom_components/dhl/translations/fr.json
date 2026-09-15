@@ -1,0 +1,170 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Méthode d'authentification",
+        "description": "Choisissez comment vous souhaitez vous authentifier avec votre compte DHL.",
+        "data": {
+          "auth_method": "Méthode d'authentification"
+        }
+      },
+      "credentials": {
+        "title": "Identifiants du compte DHL",
+        "description": "Entrez l'adresse e-mail et le mot de passe de votre compte DHL.",
+        "data": {
+          "username": "E-mail / Nom d'utilisateur",
+          "password": "Mot de passe"
+        }
+      },
+      "cookies": {
+        "title": "Cookies de session DHL",
+        "description": "Entrez vos cookies de session extraits du trafic réseau de votre navigateur sur dhl.de (contourne les vérifications anti-bot et la 2FA).",
+        "data": {
+          "dhla0": "Jeton d'accès (dhla0)",
+          "dhlr0": "Jeton d'actualisation (dhlr0)",
+          "dhlb": "Jeton de session (dhlb)",
+          "verfolgen_csrf": "Jeton CSRF (verfolgenCsrfToken)"
+        },
+        "data_description": {
+          "dhla0": "La valeur du cookie 'dhla0' de www.dhl.de",
+          "dhlr0": "La valeur du cookie 'dhlr0' de www.dhl.de",
+          "dhlb": "La valeur du cookie 'dhlb' de www.dhl.de",
+          "verfolgen_csrf": "La valeur du cookie ou de l'en-tête 'verfolgenCsrfToken' pour /int-verfolgen/"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Réauthentifier le compte DHL",
+        "description": "Votre session DHL a expiré ou nécessite une réauthentification. Entrez vos identifiants ou cookies de session mis à jour.",
+        "data": {
+          "username": "E-mail / Nom d'utilisateur",
+          "password": "Mot de passe",
+          "dhla0": "Jeton d'accès (dhla0)",
+          "dhlr0": "Jeton d'actualisation (dhlr0)",
+          "dhlb": "Jeton de session (dhlb)",
+          "verfolgen_csrf": "Jeton CSRF (verfolgenCsrfToken)"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurer le compte DHL",
+        "description": "Mettez à jour vos identifiants de connexion DHL ou vos cookies de session.",
+        "data": {
+          "username": "E-mail / Nom d'utilisateur",
+          "password": "Mot de passe",
+          "dhla0": "Jeton d'accès (dhla0)",
+          "dhlr0": "Jeton d'actualisation (dhlr0)",
+          "dhlb": "Jeton de session (dhlb)",
+          "verfolgen_csrf": "Jeton CSRF (verfolgenCsrfToken)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Échec de connexion aux serveurs DHL.",
+      "invalid_auth": "Authentification échouée. Veuillez vérifier vos identifiants ou vos cookies.",
+      "rate_limited": "Trop de requêtes. Limite de débit DHL atteinte ; veuillez réessayer plus tard.",
+      "unknown": "Une erreur inattendue est survenue."
+    },
+    "abort": {
+      "already_configured": "Ce compte DHL est déjà configuré.",
+      "reauth_successful": "La réauthentification a réussi.",
+      "reconfigure_successful": "La reconfiguration a réussi."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options DHL",
+        "description": "Configurez l'intervalle d'interrogation et les préférences de suivi des colis.",
+        "data": {
+          "poll_interval": "Intervalle de mise à jour (minutes)",
+          "include_archived": "Inclure les colis archivés"
+        },
+        "data_description": {
+          "poll_interval": "Fréquence d'interrogation des mises à jour DHL (5 à 120 minutes).",
+          "include_archived": "Indique si les envois archivés/livrés doivent être inclus dans la liste de tâches et les capteurs."
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "credentials": "Identifiants de connexion (E-mail & Mot de passe)",
+        "cookies": "Cookies de session (dhla0, dhlr0, dhlb)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "in_transit": {
+        "name": "En transit"
+      },
+      "delivered": {
+        "name": "Livré"
+      },
+      "incoming": {
+        "name": "Entrant"
+      },
+      "outgoing": {
+        "name": "Sortant"
+      },
+      "total": {
+        "name": "Total"
+      },
+      "last_update": {
+        "name": "Dernière mise à jour"
+      }
+    },
+    "todo": {
+      "parcels": {
+        "name": "Livraisons"
+      }
+    }
+  },
+  "services": {
+    "get_parcels": {
+      "name": "Obtenir les colis",
+      "description": "Récupère une liste filtrée de colis et envois DHL avec les détails de progression, de livraison et de destinataire.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Compte DHL",
+          "description": "Cible un compte DHL spécifique. Laissez vide pour interroger tous les comptes configurés."
+        },
+        "status_filter": {
+          "name": "Filtre de statut",
+          "description": "Filtrer les colis par statut de livraison ou direction (all, in_transit, delivered, incoming, outgoing)."
+        },
+        "include_archived": {
+          "name": "Inclure les archives",
+          "description": "Indique si les envois archivés/livrés doivent être inclus dans la liste retournée."
+        }
+      }
+    },
+    "refresh_parcels": {
+      "name": "Actualiser les colis",
+      "description": "Déclenche une interrogation immédiate de l'API DHL pour mettre à jour les données de suivi.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Compte DHL",
+          "description": "Cible un compte DHL spécifique. Laissez vide pour actualiser tous les comptes configurés."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_accounts_loaded": {
+      "message": "Aucun compte DHL n'est actuellement chargé."
+    },
+    "account_not_found": {
+      "message": "L'entrée de compte DHL '{target_id}' est introuvable ou non chargée."
+    },
+    "auth_failed": {
+      "message": "L'authentification DHL a échoué. Veuillez réauthentifier votre compte."
+    },
+    "connection_failed": {
+      "message": "Échec de connexion aux serveurs DHL : {error}"
+    },
+    "rate_limited": {
+      "message": "Limite de requêtes DHL dépassée. Veuillez patienter avant de réessayer."
+    }
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Metodo di autenticazione",
+        "description": "Scegli come desideri autenticarti con il tuo account DHL.",
+        "data": {
+          "auth_method": "Metodo di autenticazione"
+        }
+      },
+      "credentials": {
+        "title": "Credenziali account DHL",
+        "description": "Inserisci l'email e la password del tuo account DHL.",
+        "data": {
+          "username": "Email / Nome utente",
+          "password": "Password"
+        }
+      },
+      "cookies": {
+        "title": "Cookie di sessione DHL",
+        "description": "Inserisci i cookie di sessione estratti dal traffico di rete del browser su dhl.de (bypassa controlli anti-bot e 2FA).",
+        "data": {
+          "dhla0": "Token di accesso (dhla0)",
+          "dhlr0": "Token di aggiornamento (dhlr0)",
+          "dhlb": "Token di sessione (dhlb)",
+          "verfolgen_csrf": "Token CSRF (verfolgenCsrfToken)"
+        },
+        "data_description": {
+          "dhla0": "Il valore del cookie 'dhla0' da www.dhl.de",
+          "dhlr0": "Il valore del cookie 'dhlr0' da www.dhl.de",
+          "dhlb": "Il valore del cookie 'dhlb' da www.dhl.de",
+          "verfolgen_csrf": "Il valore del cookie o intestazione 'verfolgenCsrfToken' da /int-verfolgen/"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Riautentica account DHL",
+        "description": "La sessione DHL è scaduta o richiede una nuova autenticazione. Inserisci credenziali o cookie aggiornati.",
+        "data": {
+          "username": "Email / Nome utente",
+          "password": "Password",
+          "dhla0": "Token di accesso (dhla0)",
+          "dhlr0": "Token di aggiornamento (dhlr0)",
+          "dhlb": "Token di sessione (dhlb)",
+          "verfolgen_csrf": "Token CSRF (verfolgenCsrfToken)"
+        }
+      },
+      "reconfigure": {
+        "title": "Riconfigura account DHL",
+        "description": "Aggiorna le credenziali di accesso o i cookie di sessione DHL.",
+        "data": {
+          "username": "Email / Nome utente",
+          "password": "Password",
+          "dhla0": "Token di accesso (dhla0)",
+          "dhlr0": "Token di aggiornamento (dhlr0)",
+          "dhlb": "Token di sessione (dhlb)",
+          "verfolgen_csrf": "Token CSRF (verfolgenCsrfToken)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Connessione ai server DHL non riuscita.",
+      "invalid_auth": "Autenticazione non riuscita. Verifica credenziali o cookie.",
+      "rate_limited": "Troppe richieste. Limite di frequenza DHL raggiunto; riprova più tardi.",
+      "unknown": "Si è verificato un errore imprevisto."
+    },
+    "abort": {
+      "already_configured": "Questo account DHL è già configurato.",
+      "reauth_successful": "Riautenticazione completata con successo.",
+      "reconfigure_successful": "Riconfigurazione completata con successo."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni DHL",
+        "description": "Configura l'intervallo di aggiornamento e le preferenze di tracciamento dei pacchi.",
+        "data": {
+          "poll_interval": "Intervallo di aggiornamento (minuti)",
+          "include_archived": "Includi spedizioni archiviate"
+        },
+        "data_description": {
+          "poll_interval": "Frequenza di interrogazione di DHL per gli aggiornamenti (da 5 a 120 minuti).",
+          "include_archived": "Indica se includere le spedizioni archiviate/consegnate nella lista delle cose da fare e nei sensori."
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "credentials": "Credenziali di accesso (Email & Password)",
+        "cookies": "Cookie di sessione (dhla0, dhlr0, dhlb)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "in_transit": {
+        "name": "In transito"
+      },
+      "delivered": {
+        "name": "Consegnato"
+      },
+      "incoming": {
+        "name": "In arrivo"
+      },
+      "outgoing": {
+        "name": "In uscita"
+      },
+      "total": {
+        "name": "Totale"
+      },
+      "last_update": {
+        "name": "Ultimo aggiornamento"
+      }
+    },
+    "todo": {
+      "parcels": {
+        "name": "Spedizioni"
+      }
+    }
+  },
+  "services": {
+    "get_parcels": {
+      "name": "Ottieni pacchi",
+      "description": "Recupera un elenco filtrato di pacchi e spedizioni DHL con dettagli su avanzamento, consegna e destinatario.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account DHL",
+          "description": "ID dell'account DHL specifico. Lascia vuoto per interrogare tutti gli account configurati."
+        },
+        "status_filter": {
+          "name": "Filtro stato",
+          "description": "Filtra i pacchi per stato di consegna o direzione (all, in_transit, delivered, incoming, outgoing)."
+        },
+        "include_archived": {
+          "name": "Includi archiviati",
+          "description": "Indica se includere le spedizioni archiviate/consegnate nell'elenco restituito."
+        }
+      }
+    },
+    "refresh_parcels": {
+      "name": "Aggiorna pacchi",
+      "description": "Attiva un polling immediato delle API per aggiornare i dati di tracciamento DHL.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account DHL",
+          "description": "ID dell'account DHL specifico. Lascia vuoto per aggiornare tutti gli account configurati."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_accounts_loaded": {
+      "message": "Nessun account DHL attualmente caricato."
+    },
+    "account_not_found": {
+      "message": "L'account DHL '{target_id}' non è stato trovato o non è caricato."
+    },
+    "auth_failed": {
+      "message": "Autenticazione DHL non riuscita. Riautentica il tuo account."
+    },
+    "connection_failed": {
+      "message": "Impossibile connettersi ai server DHL: {error}"
+    },
+    "rate_limited": {
+      "message": "Limite di richieste API DHL superato. Attendi prima di riprovare."
+    }
+  }
+}

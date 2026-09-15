@@ -1,0 +1,170 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Authenticatiemethode",
+        "description": "Kies hoe je wilt verifiëren met je DHL-account.",
+        "data": {
+          "auth_method": "Authenticatiemethode"
+        }
+      },
+      "credentials": {
+        "title": "DHL-accountgegevens",
+        "description": "Voer het e-mailadres en wachtwoord van je DHL-account in.",
+        "data": {
+          "username": "E-mailadres / Gebruikersnaam",
+          "password": "Wachtwoord"
+        }
+      },
+      "cookies": {
+        "title": "DHL-sessiecookies",
+        "description": "Voer de sessiecookies in die zijn geëxtraheerd uit het browserverkeer op dhl.de (omzeilt botcontroles en 2FA).",
+        "data": {
+          "dhla0": "Toegangstoken (dhla0)",
+          "dhlr0": "Vernieuwingstoken (dhlr0)",
+          "dhlb": "Sessietoken (dhlb)",
+          "verfolgen_csrf": "CSRF-token (verfolgenCsrfToken)"
+        },
+        "data_description": {
+          "dhla0": "De waarde van de 'dhla0'-cookie van www.dhl.de",
+          "dhlr0": "De waarde van de 'dhlr0'-cookie van www.dhl.de",
+          "dhlb": "De waarde van de 'dhlb'-cookie van www.dhl.de",
+          "verfolgen_csrf": "De waarde van de 'verfolgenCsrfToken'-cookie of -header voor /int-verfolgen/"
+        }
+      },
+      "reauth_confirm": {
+        "title": "DHL-account opnieuw verifiëren",
+        "description": "Je DHL-sessie is verlopen of vereist herverificatie. Voer bijgewerkte inloggegevens of sessiecookies in.",
+        "data": {
+          "username": "E-mailadres / Gebruikersnaam",
+          "password": "Wachtwoord",
+          "dhla0": "Toegangstoken (dhla0)",
+          "dhlr0": "Vernieuwingstoken (dhlr0)",
+          "dhlb": "Sessietoken (dhlb)",
+          "verfolgen_csrf": "CSRF-token (verfolgenCsrfToken)"
+        }
+      },
+      "reconfigure": {
+        "title": "DHL-account opnieuw configureren",
+        "description": "Werk je DHL-inloggegevens of sessiecookies bij.",
+        "data": {
+          "username": "E-mailadres / Gebruikersnaam",
+          "password": "Wachtwoord",
+          "dhla0": "Toegangstoken (dhla0)",
+          "dhlr0": "Vernieuwingstoken (dhlr0)",
+          "dhlb": "Sessietoken (dhlb)",
+          "verfolgen_csrf": "CSRF-token (verfolgenCsrfToken)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met DHL-servers.",
+      "invalid_auth": "Authenticatie mislukt. Controleer je inloggegevens of cookies.",
+      "rate_limited": "Te veel verzoeken. DHL-verzoeklimiet bereikt; probeer het later opnieuw.",
+      "unknown": "Er is een onverwachte fout opgetreden."
+    },
+    "abort": {
+      "already_configured": "Dit DHL-account is al geconfigureerd.",
+      "reauth_successful": "Herauthenticatie is geslaagd.",
+      "reconfigure_successful": "Herconfiguratie is geslaagd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "DHL-opties",
+        "description": "Configureer het update-interval en trackingvoorkeuren.",
+        "data": {
+          "poll_interval": "Update-interval (minuten)",
+          "include_archived": "Gearchiveerde zendingen opnemen"
+        },
+        "data_description": {
+          "poll_interval": "Hoe vaak DHL moet worden gecontroleerd op pakketupdates (5 tot 120 minuten).",
+          "include_archived": "Of gearchiveerde/afgeleverde zendingen moeten worden opgenomen in de takenlijst en sensoren."
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "credentials": "Inloggegevens (E-mail & Wachtwoord)",
+        "cookies": "Sessiecookies (dhla0, dhlr0, dhlb)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "in_transit": {
+        "name": "Onderweg"
+      },
+      "delivered": {
+        "name": "Afgeleverd"
+      },
+      "incoming": {
+        "name": "Inkomend"
+      },
+      "outgoing": {
+        "name": "Uitgaand"
+      },
+      "total": {
+        "name": "Totaal"
+      },
+      "last_update": {
+        "name": "Laatste update"
+      }
+    },
+    "todo": {
+      "parcels": {
+        "name": "Zendingen"
+      }
+    }
+  },
+  "services": {
+    "get_parcels": {
+      "name": "Pakketten ophalen",
+      "description": "Haalt een gefilterde lijst van gevolgde DHL-pakketten en zendingen op met voortgangs-, bezorg- en ontvangersdetails.",
+      "fields": {
+        "config_entry_id": {
+          "name": "DHL-account",
+          "description": "ID van een specifiek DHL-account. Laat leeg om alle geconfigureerde accounts op te vragen."
+        },
+        "status_filter": {
+          "name": "Statusfilter",
+          "description": "Filter pakketten op bezorgstatus of richting (all, in_transit, delivered, incoming, outgoing)."
+        },
+        "include_archived": {
+          "name": "Inclusief gearchiveerd",
+          "description": "Of gearchiveerde/afgeleverde zendingen moeten worden opgenomen in de lijst."
+        }
+      }
+    },
+    "refresh_parcels": {
+      "name": "Pakketten vernieuwen",
+      "description": "Activeert een onmiddellijke API-controle om DHL-trackinggegevens te vernieuwen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "DHL-account",
+          "description": "ID van een specifiek DHL-account. Laat leeg om alle accounts te vernieuwen."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_accounts_loaded": {
+      "message": "Er zijn momenteel geen DHL-accounts geladen."
+    },
+    "account_not_found": {
+      "message": "DHL-account '{target_id}' is niet gevonden of niet geladen."
+    },
+    "auth_failed": {
+      "message": "DHL-authenticatie mislukt. Verifieer je account opnieuw."
+    },
+    "connection_failed": {
+      "message": "Kan geen verbinding maken met DHL-servers: {error}"
+    },
+    "rate_limited": {
+      "message": "DHL-API-verzoeklimiet overschreden. Wacht even voordat je het opnieuw probeert."
+    }
+  }
+}

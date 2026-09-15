@@ -1,0 +1,170 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Authentifizierungsmethode",
+        "description": "Wähle aus, wie du dich bei deinem DHL-Kundenkonto anmelden möchtest.",
+        "data": {
+          "auth_method": "Authentifizierungsmethode"
+        }
+      },
+      "credentials": {
+        "title": "DHL-Zugangsdaten",
+        "description": "Gib die E-Mail-Adresse und das Passwort deines DHL-Kundenkontos ein.",
+        "data": {
+          "username": "E-Mail / Benutzername",
+          "password": "Passwort"
+        }
+      },
+      "cookies": {
+        "title": "DHL-Sitzungscookies",
+        "description": "Gib deine aus dem Browser-Netzwerkverkehr auf dhl.de exportierten Sitzungscookies ein (umgeht Bot-Abfragen und 2FA).",
+        "data": {
+          "dhla0": "Access-Token (dhla0)",
+          "dhlr0": "Refresh-Token (dhlr0)",
+          "dhlb": "Sitzungs-Token (dhlb)",
+          "verfolgen_csrf": "CSRF-Token (verfolgenCsrfToken)"
+        },
+        "data_description": {
+          "dhla0": "Der Wert des 'dhla0'-Cookies von www.dhl.de",
+          "dhlr0": "Der Wert des 'dhlr0'-Cookies von www.dhl.de",
+          "dhlb": "Der Wert des 'dhlb'-Cookies von www.dhl.de",
+          "verfolgen_csrf": "Der Wert des 'verfolgenCsrfToken'-Cookies oder Headers von /int-verfolgen/-Anfragen"
+        }
+      },
+      "reauth_confirm": {
+        "title": "DHL-Konto erneut authentifizieren",
+        "description": "Deine DHL-Sitzung ist abgelaufen oder erfordert eine erneute Authentifizierung. Gib aktualisierte Zugangsdaten oder Sitzungscookies ein.",
+        "data": {
+          "username": "E-Mail / Benutzername",
+          "password": "Passwort",
+          "dhla0": "Access-Token (dhla0)",
+          "dhlr0": "Refresh-Token (dhlr0)",
+          "dhlb": "Sitzungs-Token (dhlb)",
+          "verfolgen_csrf": "CSRF-Token (verfolgenCsrfToken)"
+        }
+      },
+      "reconfigure": {
+        "title": "DHL-Konto neu konfigurieren",
+        "description": "Aktualisiere deine DHL-Zugangsdaten oder Sitzungscookies.",
+        "data": {
+          "username": "E-Mail / Benutzername",
+          "password": "Passwort",
+          "dhla0": "Access-Token (dhla0)",
+          "dhlr0": "Refresh-Token (dhlr0)",
+          "dhlb": "Sitzungs-Token (dhlb)",
+          "verfolgen_csrf": "CSRF-Token (verfolgenCsrfToken)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu den DHL-Servern fehlgeschlagen.",
+      "invalid_auth": "Authentifizierung fehlgeschlagen. Bitte Zugangsdaten oder Cookies überprüfen.",
+      "rate_limited": "Zu viele Anfragen. DHL-Ratenbegrenzung erreicht; bitte später erneut versuchen.",
+      "unknown": "Ein unerwarteter Fehler ist aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Dieses DHL-Konto ist bereits eingerichtet.",
+      "reauth_successful": "Erneute Authentifizierung war erfolgreich.",
+      "reconfigure_successful": "Neukonfiguration war erfolgreich."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "DHL-Optionen",
+        "description": "Abrufintervall und Einstellungen zur Sendungsverfolgung konfigurieren.",
+        "data": {
+          "poll_interval": "Abrufintervall (Minuten)",
+          "include_archived": "Archivierte Sendungen einbeziehen"
+        },
+        "data_description": {
+          "poll_interval": "Wie oft DHL nach Paketaktualisierungen abgefragt werden soll (5 bis 120 Minuten).",
+          "include_archived": "Ob archivierte/zugestellte Sendungen in der Aufgabenliste und den Sensoren enthalten sein sollen."
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "credentials": "Anmeldedaten (E-Mail & Passwort)",
+        "cookies": "Sitzungscookies (dhla0, dhlr0, dhlb)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "in_transit": {
+        "name": "Unterwegs"
+      },
+      "delivered": {
+        "name": "Zugestellt"
+      },
+      "incoming": {
+        "name": "Eingehend"
+      },
+      "outgoing": {
+        "name": "Ausgehend"
+      },
+      "total": {
+        "name": "Gesamt"
+      },
+      "last_update": {
+        "name": "Letzte Aktualisierung"
+      }
+    },
+    "todo": {
+      "parcels": {
+        "name": "Sendungen"
+      }
+    }
+  },
+  "services": {
+    "get_parcels": {
+      "name": "Sendungen abrufen",
+      "description": "Ruft eine gefilterte Liste verfolgter DHL-Pakete und Sendungen mit detaillierten Fortschritts-, Zustell- und Empfängerdaten ab.",
+      "fields": {
+        "config_entry_id": {
+          "name": "DHL-Konto",
+          "description": "ID eines bestimmten DHL-Konto-Eintrags. Leer lassen, um alle konfigurierten DHL-Konten abzufragen."
+        },
+        "status_filter": {
+          "name": "Statusfilter",
+          "description": "Pakete nach Zustellstatus oder Richtung filtern (all, in_transit, delivered, incoming, outgoing)."
+        },
+        "include_archived": {
+          "name": "Archivierte einbeziehen",
+          "description": "Ob zugestellte/archivierte Sendungen in der zurückgegebenen Liste enthalten sein sollen."
+        }
+      }
+    },
+    "refresh_parcels": {
+      "name": "Sendungen aktualisieren",
+      "description": "Löst eine sofortige API-Aktualisierung der DHL-Sendungsverfolgungsdaten aus.",
+      "fields": {
+        "config_entry_id": {
+          "name": "DHL-Konto",
+          "description": "ID eines bestimmten DHL-Konto-Eintrags. Leer lassen, um alle Konten zu aktualisieren."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_accounts_loaded": {
+      "message": "Derzeit sind keine DHL-Konten geladen."
+    },
+    "account_not_found": {
+      "message": "DHL-Kontoeintrag '{target_id}' wurde nicht gefunden oder ist nicht geladen."
+    },
+    "auth_failed": {
+      "message": "DHL-Authentifizierung fehlgeschlagen. Bitte das Konto erneut authentifizieren."
+    },
+    "connection_failed": {
+      "message": "Verbindung zu den DHL-Servern fehlgeschlagen: {error}"
+    },
+    "rate_limited": {
+      "message": "DHL-API-Ratenbegrenzung überschritten. Bitte vor einem erneuten Versuch warten."
+    }
+  }
+}

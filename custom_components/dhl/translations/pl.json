@@ -1,0 +1,170 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Metoda uwierzytelniania",
+        "description": "Wybierz sposób logowania do konta DHL.",
+        "data": {
+          "auth_method": "Metoda uwierzytelniania"
+        }
+      },
+      "credentials": {
+        "title": "Dane logowania do konta DHL",
+        "description": "Wprowadź adres e-mail i hasło do swojego konta DHL.",
+        "data": {
+          "username": "E-mail / Nazwa użytkownika",
+          "password": "Hasło"
+        }
+      },
+      "cookies": {
+        "title": "Pliki cookie sesji DHL",
+        "description": "Wprowadź pliki cookie sesji wyodrębnione z ruchu sieciowego w przeglądarce na dhl.de (omija weryfikację botów i 2FA).",
+        "data": {
+          "dhla0": "Token dostępu (dhla0)",
+          "dhlr0": "Token odświeżania (dhlr0)",
+          "dhlb": "Token sesji (dhlb)",
+          "verfolgen_csrf": "Token CSRF (verfolgenCsrfToken)"
+        },
+        "data_description": {
+          "dhla0": "Wartość pliku cookie 'dhla0' z www.dhl.de",
+          "dhlr0": "Wartość pliku cookie 'dhlr0' z www.dhl.de",
+          "dhlb": "Wartość pliku cookie 'dhlb' z www.dhl.de",
+          "verfolgen_csrf": "Wartość pliku cookie lub nagłówka 'verfolgenCsrfToken' dla /int-verfolgen/"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Ponowne uwierzytelnienie konta DHL",
+        "description": "Twoja sesja DHL wygasła lub wymaga ponownego uwierzytelnienia. Wprowadź zaktualizowane dane lub pliki cookie sesji.",
+        "data": {
+          "username": "E-mail / Nazwa użytkownika",
+          "password": "Hasło",
+          "dhla0": "Token dostępu (dhla0)",
+          "dhlr0": "Token odświeżania (dhlr0)",
+          "dhlb": "Token sesji (dhlb)",
+          "verfolgen_csrf": "Token CSRF (verfolgenCsrfToken)"
+        }
+      },
+      "reconfigure": {
+        "title": "Ponowna konfiguracja konta DHL",
+        "description": "Zaktualizuj swoje dane logowania lub pliki cookie sesji DHL.",
+        "data": {
+          "username": "E-mail / Nazwa użytkownika",
+          "password": "Hasło",
+          "dhla0": "Token dostępu (dhla0)",
+          "dhlr0": "Token odświeżania (dhlr0)",
+          "dhlb": "Token sesji (dhlb)",
+          "verfolgen_csrf": "Token CSRF (verfolgenCsrfToken)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć z serwerami DHL.",
+      "invalid_auth": "Uwierzytelnianie nie powiodło się. Sprawdź dane logowania lub pliki cookie.",
+      "rate_limited": "Zbyt wiele żądań. Osiągnięto limit zapytań DHL; spróbuj ponownie później.",
+      "unknown": "Wystąpił nieoczekiwany błąd."
+    },
+    "abort": {
+      "already_configured": "To konto DHL jest już skonfigurowane.",
+      "reauth_successful": "Ponowne uwierzytelnienie zakończone sukcesem.",
+      "reconfigure_successful": "Ponowna konfiguracja zakończona sukcesem."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opcje DHL",
+        "description": "Skonfiguruj częstotliwość odpytywania i preferencje śledzenia przesyłek.",
+        "data": {
+          "poll_interval": "Częstotliwość aktualizacji (minuty)",
+          "include_archived": "Uwzględnij zarchiwizowane przesyłki"
+        },
+        "data_description": {
+          "poll_interval": "Jak często odpytywać DHL o aktualizacje paczek (od 5 do 120 minut).",
+          "include_archived": "Czy uwzględniać zarchiwizowane/doręczone przesyłki na liście zadań i w sensorach."
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "credentials": "Dane logowania (E-mail i Hasło)",
+        "cookies": "Pliki cookie sesji (dhla0, dhlr0, dhlb)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "in_transit": {
+        "name": "W drodze"
+      },
+      "delivered": {
+        "name": "Doręczona"
+      },
+      "incoming": {
+        "name": "Przychodząca"
+      },
+      "outgoing": {
+        "name": "Wychodząca"
+      },
+      "total": {
+        "name": "Łącznie"
+      },
+      "last_update": {
+        "name": "Ostatnia aktualizacja"
+      }
+    },
+    "todo": {
+      "parcels": {
+        "name": "Przesyłki"
+      }
+    }
+  },
+  "services": {
+    "get_parcels": {
+      "name": "Pobierz przesyłki",
+      "description": "Pobiera przefiltrowaną listę śledzonych paczek DHL ze szczegółami postępu, doręczenia i odbiorcy.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto DHL",
+          "description": "ID konkretnego konta DHL. Pozostaw puste, aby odpytać wszystkie skonfigurowane konta."
+        },
+        "status_filter": {
+          "name": "Filtr statusu",
+          "description": "Filtruj paczki według statusu doręczenia lub kierunku (all, in_transit, delivered, incoming, outgoing)."
+        },
+        "include_archived": {
+          "name": "Uwzględnij zarchiwizowane",
+          "description": "Czy uwzględnić doręczone/zarchiwizowane przesyłki na zwróconej liście."
+        }
+      }
+    },
+    "refresh_parcels": {
+      "name": "Odśwież przesyłki",
+      "description": "Wyzwala natychmiastowe odpytanie API w celu zaktualizowania danych śledzenia DHL.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto DHL",
+          "description": "ID konkretnego konta DHL. Pozostaw puste, aby odświeżyć wszystkie skonfigurowane konta."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_accounts_loaded": {
+      "message": "Obecnie nie załadowano żadnych kont DHL."
+    },
+    "account_not_found": {
+      "message": "Konto DHL '{target_id}' nie zostało znalezione lub nie jest załadowane."
+    },
+    "auth_failed": {
+      "message": "Uwierzytelnianie DHL nie powiodło się. Uwierzytelnij konto ponownie."
+    },
+    "connection_failed": {
+      "message": "Nie udało się połączyć z serwerami DHL: {error}"
+    },
+    "rate_limited": {
+      "message": "Przekroczono limit zapytań API DHL. Poczekaj przed ponowną próbą."
+    }
+  }
+}

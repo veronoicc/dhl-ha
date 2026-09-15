@@ -1,0 +1,170 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Authentication Method",
+        "description": "Choose how you want to authenticate with your DHL account.",
+        "data": {
+          "auth_method": "Authentication Method"
+        }
+      },
+      "credentials": {
+        "title": "DHL Account Credentials",
+        "description": "Enter your DHL account email and password to log in automatically.",
+        "data": {
+          "username": "Email / Username",
+          "password": "Password"
+        }
+      },
+      "cookies": {
+        "title": "DHL Session Cookies",
+        "description": "Enter your session cookies extracted from browser network traffic on dhl.de (bypasses bot challenges and 2FA).",
+        "data": {
+          "dhla0": "Access Token (dhla0)",
+          "dhlr0": "Refresh Token (dhlr0)",
+          "dhlb": "Session Token (dhlb)",
+          "verfolgen_csrf": "CSRF Token (verfolgenCsrfToken)"
+        },
+        "data_description": {
+          "dhla0": "The 'dhla0' cookie value from www.dhl.de",
+          "dhlr0": "The 'dhlr0' cookie value from www.dhl.de",
+          "dhlb": "The 'dhlb' cookie value from www.dhl.de",
+          "verfolgen_csrf": "The 'verfolgenCsrfToken' cookie value or header from /int-verfolgen/ requests"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate DHL Account",
+        "description": "Your DHL session has expired or requires re-authentication. Enter updated credentials or session cookies.",
+        "data": {
+          "username": "Email / Username",
+          "password": "Password",
+          "dhla0": "Access Token (dhla0)",
+          "dhlr0": "Refresh Token (dhlr0)",
+          "dhlb": "Session Token (dhlb)",
+          "verfolgen_csrf": "CSRF Token (verfolgenCsrfToken)"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure DHL Account",
+        "description": "Update your DHL login credentials or session cookies.",
+        "data": {
+          "username": "Email / Username",
+          "password": "Password",
+          "dhla0": "Access Token (dhla0)",
+          "dhlr0": "Refresh Token (dhlr0)",
+          "dhlb": "Session Token (dhlb)",
+          "verfolgen_csrf": "CSRF Token (verfolgenCsrfToken)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to DHL servers.",
+      "invalid_auth": "Authentication failed. Please verify your credentials or cookies.",
+      "rate_limited": "Too many requests. DHL rate limit reached; please try again later.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This DHL account is already configured.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "Reconfiguration was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "DHL Options",
+        "description": "Configure polling interval and shipment tracking preferences.",
+        "data": {
+          "poll_interval": "Update Interval (minutes)",
+          "include_archived": "Include Archived Shipments"
+        },
+        "data_description": {
+          "poll_interval": "How often to poll DHL for parcel updates (5 to 120 minutes).",
+          "include_archived": "Whether to include archived/delivered shipments in the To-do list and sensors."
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "credentials": "Login credentials (Email & Password)",
+        "cookies": "Session cookies (dhla0, dhlr0, dhlb)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "in_transit": {
+        "name": "In transit"
+      },
+      "delivered": {
+        "name": "Delivered"
+      },
+      "incoming": {
+        "name": "Incoming"
+      },
+      "outgoing": {
+        "name": "Outgoing"
+      },
+      "total": {
+        "name": "Total"
+      },
+      "last_update": {
+        "name": "Last update"
+      }
+    },
+    "todo": {
+      "parcels": {
+        "name": "Deliveries"
+      }
+    }
+  },
+  "services": {
+    "get_parcels": {
+      "name": "Get parcels",
+      "description": "Fetch a filtered list of tracked DHL parcels and shipments with detailed progress, delivery, and recipient information.",
+      "fields": {
+        "config_entry_id": {
+          "name": "DHL Account",
+          "description": "Target a specific DHL account config entry ID. Leave empty to query all configured DHL accounts."
+        },
+        "status_filter": {
+          "name": "Status filter",
+          "description": "Filter parcels by delivery state or direction (all, in_transit, delivered, incoming, outgoing)."
+        },
+        "include_archived": {
+          "name": "Include archived",
+          "description": "Whether to include completed/archived shipments in the returned list."
+        }
+      }
+    },
+    "refresh_parcels": {
+      "name": "Refresh parcels",
+      "description": "Trigger an immediate API poll to refresh DHL parcel tracking data.",
+      "fields": {
+        "config_entry_id": {
+          "name": "DHL Account",
+          "description": "Target a specific DHL account config entry ID. Leave empty to refresh all configured accounts."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_accounts_loaded": {
+      "message": "No DHL accounts are currently loaded."
+    },
+    "account_not_found": {
+      "message": "DHL account entry '{target_id}' was not found or is not loaded."
+    },
+    "auth_failed": {
+      "message": "DHL authentication failed. Please re-authenticate your account."
+    },
+    "connection_failed": {
+      "message": "Failed to connect to DHL servers: {error}"
+    },
+    "rate_limited": {
+      "message": "DHL API rate limit exceeded. Please wait before retrying."
+    }
+  }
+}
