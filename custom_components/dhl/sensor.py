@@ -47,7 +47,6 @@ class DHLBaseSensor(CoordinatorEntity[DHLDataUpdateCoordinator], SensorEntity):
     """Base class for DHL sensor entities."""
 
     _attr_has_entity_name = True
-    _attr_name = None
 
     def __init__(
         self,
@@ -335,6 +334,7 @@ class DHLParcelTotalSensor(DHLBaseSensor):
             return len(self.coordinator.all_parcels or self.coordinator.data)
         return len(self.coordinator.data)
 
+    @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return breakdown counts of all monitored parcels."""
         data = self.coordinator.data
