@@ -20,6 +20,7 @@
         "title": "Cookies de session DHL",
         "description": "Entrez vos cookies de session extraits du trafic réseau de votre navigateur sur dhl.de (contourne les vérifications anti-bot et la 2FA).",
         "data": {
+          "email": "E-mail / Nom du compte (optionnel)",
           "dhla0": "Jeton d'accès (dhla0)",
           "dhlr0": "Jeton d'actualisation (dhlr0)",
           "dhlb": "Jeton de session (dhlb)",

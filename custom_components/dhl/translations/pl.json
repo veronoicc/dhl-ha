@@ -20,6 +20,7 @@
         "title": "Pliki cookie sesji DHL",
         "description": "Wprowadź pliki cookie sesji wyodrębnione z ruchu sieciowego w przeglądarce na dhl.de (omija weryfikację botów i 2FA).",
         "data": {
+          "email": "E-mail / Nazwa konta (opcjonalnie)",
           "dhla0": "Token dostępu (dhla0)",
           "dhlr0": "Token odświeżania (dhlr0)",
           "dhlb": "Token sesji (dhlb)",

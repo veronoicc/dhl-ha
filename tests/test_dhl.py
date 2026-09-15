@@ -240,6 +240,22 @@ def test_jwt_payload_decoding():
     assert decoded.get("display_name") == "Max Mustermann"
     assert decoded.get("exp") == 1789493423
 
+    # Test fallback claim names
+    payload_alt = json.dumps(
+        {
+            "preferred_username": "fallback@example.com",
+            "postnumber": "9876543210",
+        }
+    )
+    b64_alt = (
+        base64.urlsafe_b64encode(payload_alt.encode("utf-8"))
+        .decode("ascii")
+        .rstrip("=")
+    )
+    decoded_alt = _decode_jwt_payload(f"eyJ.{b64_alt}.sig")
+    assert decoded_alt.get("email") == "fallback@example.com"
+    assert decoded_alt.get("post_number") == "9876543210"
+
 
 def test_diagnostics_redaction_keys():
     """Verify sensitive authentication keys are in the redaction set."""

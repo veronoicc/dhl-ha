@@ -20,6 +20,7 @@
         "title": "DHL Session Cookies",
         "description": "Enter your session cookies extracted from browser network traffic on dhl.de (bypasses bot challenges and 2FA).",
         "data": {
+          "email": "Email / Account name (optional)",
           "dhla0": "Access Token (dhla0)",
           "dhlr0": "Refresh Token (dhlr0)",
           "dhlb": "Session Token (dhlb)",

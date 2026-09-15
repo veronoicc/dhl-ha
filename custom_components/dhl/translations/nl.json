@@ -20,6 +20,7 @@
         "title": "DHL-sessiecookies",
         "description": "Voer de sessiecookies in die zijn geëxtraheerd uit het browserverkeer op dhl.de (omzeilt botcontroles en 2FA).",
         "data": {
+          "email": "E-mail / Accountnaam (optioneel)",
           "dhla0": "Toegangstoken (dhla0)",
           "dhlr0": "Vernieuwingstoken (dhlr0)",
           "dhlb": "Sessietoken (dhlb)",

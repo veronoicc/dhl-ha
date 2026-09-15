@@ -20,6 +20,7 @@
         "title": "DHL-Sitzungscookies",
         "description": "Gib deine aus dem Browser-Netzwerkverkehr auf dhl.de exportierten Sitzungscookies ein (umgeht Bot-Abfragen und 2FA).",
         "data": {
+          "email": "E-Mail / Kontoname (optional)",
           "dhla0": "Access-Token (dhla0)",
           "dhlr0": "Refresh-Token (dhlr0)",
           "dhlb": "Sitzungs-Token (dhlb)",

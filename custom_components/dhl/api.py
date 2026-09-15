@@ -75,7 +75,36 @@ def _decode_jwt_payload(token: str) -> dict[str, Any]:
     try:
         raw_bytes = base64.urlsafe_b64decode(padded.encode("ascii"))
         data = json.loads(raw_bytes.decode("utf-8"))
-        return data if isinstance(data, dict) else {}
+        if not isinstance(data, dict):
+            return {}
+
+        # Normalize email from known Auth0 / CIAM claim variations
+        if "email" not in data:
+            for key in (
+                "https://account.dhl.de/email",
+                "preferred_username",
+                "user_email",
+                "mail",
+            ):
+                if val := data.get(key):
+                    data["email"] = str(val)
+                    break
+            if "email" not in data and (sub := str(data.get("sub", ""))) and "@" in sub:
+                data["email"] = sub.split("|")[-1]
+
+        # Normalize post_number from known claim variations
+        if "post_number" not in data:
+            for key in (
+                "https://account.dhl.de/post_number",
+                "postnumber",
+                "post_nummer",
+                "postNumber",
+            ):
+                if val := data.get(key):
+                    data["post_number"] = str(val)
+                    break
+
+        return data
     except (json.JSONDecodeError, ValueError, UnicodeDecodeError) as err:
         _LOGGER.debug("Failed to decode JWT payload: %s", err)
         return {}
@@ -410,6 +439,7 @@ class DHLClient:
         dhlr0: str,
         dhlb: str,
         verfolgen_csrf: str | None = None,
+        email_override: str | None = None,
     ) -> DHLCredentials:
         """Configure client directly with session cookies."""
         _LOGGER.debug(
@@ -429,7 +459,11 @@ class DHLClient:
         )
 
         payload = _decode_jwt_payload(dhla0_clean)
-        email = str(payload.get("email") or "")
+        email = (
+            email_override.strip()
+            if (email_override and email_override.strip())
+            else str(payload.get("email") or "")
+        )
         post_number = str(payload.get("post_number") or "")
         display_name = str(payload.get("display_name") or email)
         expires_at = float(payload.get("exp") or (time.time() + 1800))
@@ -615,6 +649,12 @@ class DHLClient:
                 parcels: list[Parcel] = []
                 for item in sendungen:
                     if isinstance(item, dict):
+                        # Try to resolve email from parcel details if missing
+                        if not self.credentials.email:
+                            details = item.get("sendungsdetails") or {}
+                            if parcel_email := details.get("email"):
+                                self.credentials.email = str(parcel_email)
+
                         try:
                             parcels.append(Parcel.from_api_dict(item))
                         except (KeyError, TypeError, ValueError) as err:
@@ -627,7 +667,6 @@ class DHLClient:
                     sum(1 for p in parcels if p.is_delivered),
                 )
                 return parcels
-
         except (aiohttp.ClientError, asyncio.TimeoutError) as err:
             _LOGGER.warning("Connection error while fetching DHL shipments: %s", err)
             raise DHLConnectionError(
@@ -643,8 +682,8 @@ class DHLClient:
         _LOGGER.debug("Validating DHL credentials via test API request...")
         await self.async_get_shipments()
 
-        email = self.credentials.email or "dhl_account"
-        post_number = self.credentials.post_number or email
+        email = self.credentials.email or ""
+        post_number = self.credentials.post_number or ""
         _LOGGER.debug(
             "Validation successful for %s (post_number: %s)",
             _mask_identifier(email),

@@ -157,10 +157,16 @@ class DHLConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 unique_id = post_number if post_number else email
+                if not unique_id:
+                    unique_id = username
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
 
-                title = f"DHL ({email})" if email else f"DHL ({unique_id})"
+                title = (
+                    f"DHL ({email})"
+                    if email
+                    else (f"DHL ({post_number})" if post_number else "DHL")
+                )
                 _LOGGER.info(
                     "Configured new DHL account '%s' (post_number: %s)",
                     title,
@@ -216,18 +222,20 @@ class DHLConfigFlow(ConfigFlow, domain=DOMAIN):
             dhlr0 = user_input[CONF_DHLR0].strip()
             dhlb = user_input[CONF_DHLB].strip()
             verfolgen_csrf = user_input.get(CONF_VERFOLGEN_CSRF, "").strip()
+            email_override = user_input.get(CONF_EMAIL, "").strip()
 
             session = async_get_clientsession(self.hass)
             client = DHLClient(session)
 
             try:
                 creds = await client.async_login_with_cookies(
-                    dhla0, dhlr0, dhlb, verfolgen_csrf
+                    dhla0,
+                    dhlr0,
+                    dhlb,
+                    verfolgen_csrf,
+                    email_override=email_override if email_override else None,
                 )
                 email, post_number = await client.async_validate()
-            except DHLAuthError as err:
-                _LOGGER.warning("DHL cookie authentication failed: %s", err)
-                errors["base"] = "invalid_auth"
             except DHLConnectionError as err:
                 _LOGGER.warning("DHL connection error during cookie login: %s", err)
                 errors["base"] = "cannot_connect"
@@ -242,10 +250,16 @@ class DHLConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 unique_id = post_number if post_number else email
+                if not unique_id:
+                    unique_id = creds.dhla0[:16]
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
 
-                title = f"DHL ({email})" if email else f"DHL ({unique_id})"
+                title = (
+                    f"DHL ({email})"
+                    if email
+                    else (f"DHL ({post_number})" if post_number else "DHL")
+                )
                 _LOGGER.info(
                     "Configured new DHL account via cookies '%s' (post_number: %s)",
                     title,
@@ -266,6 +280,12 @@ class DHLConfigFlow(ConfigFlow, domain=DOMAIN):
 
         schema = vol.Schema(
             {
+                vol.Optional(CONF_EMAIL): TextSelector(
+                    TextSelectorConfig(
+                        type=TextSelectorType.EMAIL,
+                        autocomplete="email",
+                    )
+                ),
                 vol.Required(CONF_DHLA0): TextSelector(
                     TextSelectorConfig(type=TextSelectorType.PASSWORD)
                 ),
@@ -280,7 +300,6 @@ class DHLConfigFlow(ConfigFlow, domain=DOMAIN):
                 ),
             }
         )
-
         return self.async_show_form(
             step_id="cookies",
             data_schema=schema,
