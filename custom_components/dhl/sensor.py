@@ -17,9 +17,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import DHLConfigEntry
-from .const import DOMAIN
+from .const import CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED, DOMAIN
 from .coordinator import DHLDataUpdateCoordinator
-from .models import Parcel, ParcelDirection, ParcelListType
+from .models import Parcel, ParcelDirection
 
 
 async def async_setup_entry(
@@ -47,6 +47,7 @@ class DHLBaseSensor(CoordinatorEntity[DHLDataUpdateCoordinator], SensorEntity):
     """Base class for DHL sensor entities."""
 
     _attr_has_entity_name = True
+    _attr_name = None
 
     def __init__(
         self,
@@ -158,7 +159,14 @@ class DHLParcelDeliveredSensor(DHLBaseSensor):
     @property
     def _delivered_parcels(self) -> list[Parcel]:
         """Return list of delivered parcels."""
-        return [p for p in self.coordinator.data if p.is_delivered]
+        include_archived = self.entry.options.get(
+            CONF_INCLUDE_ARCHIVED,
+            self.entry.data.get(CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED),
+        )
+        source = (
+            self.coordinator.all_parcels if include_archived else self.coordinator.data
+        )
+        return [p for p in source if p.is_delivered]
 
     @property
     def native_value(self) -> int:
@@ -280,10 +288,11 @@ class DHLParcelArchivedSensor(DHLBaseSensor):
     @property
     def _archived_parcels(self) -> list[Parcel]:
         """Return list of archived parcels."""
+        source = self.coordinator.all_parcels or self.coordinator.data or []
         return [
             p
-            for p in self.coordinator.all_parcels
-            if p.list_type == ParcelListType.ARCHIVIERT or p.is_archived
+            for p in source
+            if p.is_archived or str(p.list_type).upper() == "ARCHIVIERT"
         ]
 
     @property
@@ -318,9 +327,14 @@ class DHLParcelTotalSensor(DHLBaseSensor):
     @property
     def native_value(self) -> int:
         """Return the total count of monitored parcels."""
+        include_archived = self.entry.options.get(
+            CONF_INCLUDE_ARCHIVED,
+            self.entry.data.get(CONF_INCLUDE_ARCHIVED, DEFAULT_INCLUDE_ARCHIVED),
+        )
+        if include_archived:
+            return len(self.coordinator.all_parcels or self.coordinator.data)
         return len(self.coordinator.data)
 
-    @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return breakdown counts of all monitored parcels."""
         data = self.coordinator.data

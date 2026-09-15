@@ -41,6 +41,7 @@ class DHLParcelTodoListEntity(
     """Interactive deliveries To-do list for a DHL account."""
 
     _attr_has_entity_name = True
+    _attr_name = None
     _attr_translation_key = "parcels"
     _attr_icon = "mdi:truck-delivery-outline"
     _attr_supported_features = TodoListEntityFeature(0)
